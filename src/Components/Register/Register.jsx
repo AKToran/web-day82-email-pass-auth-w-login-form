@@ -1,18 +1,33 @@
-import React from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+import { auth } from "../../firebase.init";
 
 const Register = () => {
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const handleRegister = (e) =>{
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    console.log(email, password);
+    setErrorMessage('');
+    setSuccessMessage(false);
 
+    createUserWithEmailAndPassword(auth, email, password)
+    .then(userCredential =>{
+      const user = userCredential.user;
+      setSuccessMessage('Check your email for verification.')
+      console.log(user);
+    })
+    .catch(err=>{
+      console.log(err);
+      setErrorMessage(err.message)
+    })
   }
 
   return (
-    <div className="mx-auto max-w-100 mt-14 text-center">
+    <div className="mx-auto max-w-100 mt-10 text-center shadow-2xl p-8">
       <h1 className="text-3xl my-8 font-bold">Create an Account</h1>
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
@@ -75,8 +90,15 @@ const Register = () => {
           </p>
         </div>
         <div>
-          <input className="btn" type="submit" value="Submit" />
+          <input className="btn" type="submit" value="Sign Up" />
         </div>
+
+        {
+          errorMessage && <p className="text-red-500">{errorMessage}</p>
+        }
+        {
+          successMessage && <p className="text-green-600">{successMessage}</p>
+        }
       </form>
     </div>
   );
