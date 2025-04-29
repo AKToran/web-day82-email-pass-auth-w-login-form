@@ -12,8 +12,8 @@ const Register = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl my-4">Create an Account</h1>
+    <div className="mx-auto max-w-100 mt-14 text-center">
+      <h1 className="text-3xl my-8 font-bold">Create an Account</h1>
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
           <label className="input validator">
@@ -61,7 +61,7 @@ const Register = () => {
               name="password"
               required
               placeholder="Password"
-              minlength="8"
+              minLength="8"
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
             />
