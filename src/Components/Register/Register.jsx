@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { auth } from "../../firebase.init";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa6";
+import { Link } from "react-router";
 
 const Register = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,8 +37,8 @@ const Register = () => {
   };
 
   return (
-    <div className="mx-auto max-w-100 mt-10 text-center shadow-2xl p-8">
-      <h1 className="text-3xl my-8 font-bold">Create an Account</h1>
+    <div className="mx-auto max-w-96 mt-10 shadow-2xl p-8">
+      <h1 className="text-3xl my-8 font-bold text-center">Create an Account</h1>
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
           <label className="input validator">
@@ -112,16 +113,16 @@ const Register = () => {
             At least one uppercase letter
           </p>
         </div>
-        <div className="ms-2 justify-self-start">
+        <div>
         <label className="label">
           <input type="checkbox" name="terms" className="checkbox" />
-          Accept <a className="text-blue-600" href="">Terms & Conditions.</a>
+          Accept <a className="text-blue-600 underline" href="">Terms & Conditions.</a>
         </label>
         </div>
         <div>
           <input className="btn" type="submit" value="Sign Up" />
         </div>
-
+        <p>Already have an account? <Link className="text-blue-600 underline" to={'/login'}>Login</Link> </p>
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         {successMessage && <p className="text-green-600">{successMessage}</p>}
       </form>
