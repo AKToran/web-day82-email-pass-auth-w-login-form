@@ -1,30 +1,39 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../../firebase.init";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa6";
 
 const Register = () => {
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleRegister = (e) =>{
+  const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
+    const terms = e.target.terms.checked;
 
-    setErrorMessage('');
+    setErrorMessage("");
     setSuccessMessage(false);
 
+    if(!terms){
+      setErrorMessage('Must accept our terms and conditions.')
+      return;
+    }
+
     createUserWithEmailAndPassword(auth, email, password)
-    .then(userCredential =>{
-      const user = userCredential.user;
-      setSuccessMessage('Check your email for verification.')
-      console.log(user);
-    })
-    .catch(err=>{
-      console.log(err);
-      setErrorMessage(err.message)
-    })
-  }
+      .then((userCredential) => {
+        const user = userCredential.user;
+        setSuccessMessage("Check your email for verification.");
+        console.log(user);
+      })
+      .catch((err) => {
+        console.log(err);
+        setErrorMessage(err.message);
+      });
+  };
 
   return (
     <div className="mx-auto max-w-100 mt-10 text-center shadow-2xl p-8">
@@ -48,7 +57,12 @@ const Register = () => {
                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
               </g>
             </svg>
-            <input type="email" name="email" placeholder="mail@site.com" required />
+            <input
+              type="email"
+              name="email"
+              placeholder="mail@site.com"
+              required
+            />
           </label>
           <div className="validator-hint hidden">Enter valid email address</div>
         </div>
@@ -72,7 +86,7 @@ const Register = () => {
               </g>
             </svg>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               required
               placeholder="Password"
@@ -80,6 +94,15 @@ const Register = () => {
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
             />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPassword(!showPassword);
+              }}
+              className="hover:cursor-pointer"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </label>
           <p className="validator-hint hidden">
             Must be more than 8 characters, including
@@ -89,16 +112,18 @@ const Register = () => {
             At least one uppercase letter
           </p>
         </div>
+        <div className="ms-2 justify-self-start">
+        <label className="label">
+          <input type="checkbox" name="terms" className="checkbox" />
+          Accept <a className="text-blue-600" href="">Terms & Conditions.</a>
+        </label>
+        </div>
         <div>
           <input className="btn" type="submit" value="Sign Up" />
         </div>
 
-        {
-          errorMessage && <p className="text-red-500">{errorMessage}</p>
-        }
-        {
-          successMessage && <p className="text-green-600">{successMessage}</p>
-        }
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        {successMessage && <p className="text-green-600">{successMessage}</p>}
       </form>
     </div>
   );
