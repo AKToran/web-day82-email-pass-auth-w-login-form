@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useRef, useState } from "react";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase.init";
 import { Link } from "react-router";
 import { FaEye } from "react-icons/fa";
@@ -7,8 +7,9 @@ import { FaEyeSlash } from "react-icons/fa6";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const emailRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,7 +17,7 @@ const Login = () => {
     const password = e.target.password.value;
 
     setErrorMessage("");
-    setSuccessMessage(false);
+    setSuccessMessage("");
 
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
@@ -26,7 +27,7 @@ const Login = () => {
           alert("Please verify your Email address.")
         }
         else{
-          setSuccessMessage(true);
+          setSuccessMessage("Login Successful.");
         }
         console.log(user);
       })
@@ -35,8 +36,26 @@ const Login = () => {
         if (err.message == "Firebase: Error (auth/invalid-credential).") {
           setErrorMessage("Invalid Email or Password!");
         }
+        else if(err.message == "Firebase: Error (auth/missing-password)."){
+          setErrorMessage("Please Enter you password.")
+        }
       });
   };
+
+  //forgot password
+  const handleForgotPassword = () =>{
+    setErrorMessage('');
+    setSuccessMessage('');
+    const email = emailRef.current.value;
+    sendPasswordResetEmail(auth, email)
+    .then(()=>{
+      setSuccessMessage("Please check your email to reset password.")
+    })
+    .catch(err=>{
+      setErrorMessage(err.message);
+    })
+  }
+
 
   return (
     <div className="mx-auto max-w-96 mt-10 shadow-2xl p-8">
@@ -46,6 +65,7 @@ const Login = () => {
         <div>
           <label className="label mb-1">Email</label>
           <input
+            ref={emailRef}
             type="email"
             name="email"
             className="input"
@@ -71,7 +91,7 @@ const Login = () => {
           </button>
         </div>
         <div>
-          <a className="link link-hover">Forgot password?</a>
+          <a onClick={handleForgotPassword} className="link link-hover">Forgot password?</a>
         </div>
         <input className="btn w-fit" type="submit" value="Login" />
       </form>
@@ -83,7 +103,7 @@ const Login = () => {
       </p>
       {errorMessage && <p className="text-red-500 py-2">{errorMessage}</p>}
       {successMessage && (
-        <p className="text-green-500 py-2">Login Successful.</p>
+        <p className="text-green-500 py-2">{successMessage}</p>
       )}
     </div>
   );
