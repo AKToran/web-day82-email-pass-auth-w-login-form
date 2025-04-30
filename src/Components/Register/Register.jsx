@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../../firebase.init";
 import { FaEye } from "react-icons/fa";
@@ -14,25 +18,37 @@ const Register = () => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
+    const name = e.target.name.value;
     const terms = e.target.terms.checked;
 
     setErrorMessage("");
     setSuccessMessage(false);
 
-    if(!terms){
-      setErrorMessage('Must accept our terms and conditions.')
+    if (!terms) {
+      setErrorMessage("Must accept our terms and conditions.");
       return;
     }
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        
+
         //email verification
-        sendEmailVerification(auth.currentUser)
-        .then(() => {
+        sendEmailVerification(auth.currentUser).then(() => {
           setSuccessMessage("Check your email for verification.");
+        });
+
+        //update user profile
+        updateProfile(auth.currentUser, {
+          displayName: name
         })
+        .then(()=>{
+          console.log('updated name');
+        })
+        .catch(err => {
+          console.log(err);
+        })
+
 
         console.log(user);
       })
@@ -46,6 +62,30 @@ const Register = () => {
     <div className="mx-auto max-w-96 mt-10 shadow-2xl p-8">
       <h1 className="text-3xl my-8 font-bold text-center">Create an Account</h1>
       <form onSubmit={handleRegister} className="space-y-4">
+        <div>
+          <label className="input validator">
+            <svg
+              className="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+              </g>
+            </svg>
+
+            <input type="text" name="name" placeholder="Your Name" required />
+          </label>
+          <div className="validator-hint hidden">Enter your username.</div>
+        </div>
+
         <div>
           <label className="input validator">
             <svg
@@ -120,15 +160,23 @@ const Register = () => {
           </p>
         </div>
         <div>
-        <label className="label">
-          <input type="checkbox" name="terms" className="checkbox" />
-          Accept <a className="text-blue-600 underline" href="">Terms & Conditions.</a>
-        </label>
+          <label className="label">
+            <input type="checkbox" name="terms" className="checkbox" />
+            Accept{" "}
+            <a className="text-blue-600 underline" href="">
+              Terms & Conditions.
+            </a>
+          </label>
         </div>
         <div>
           <input className="btn" type="submit" value="Sign Up" />
         </div>
-        <p>Already have an account? <Link className="text-blue-600 underline" to={'/login'}>Login</Link> </p>
+        <p>
+          Already have an account?{" "}
+          <Link className="text-blue-600 underline" to={"/login"}>
+            Login
+          </Link>{" "}
+        </p>
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         {successMessage && <p className="text-green-600">{successMessage}</p>}
       </form>
